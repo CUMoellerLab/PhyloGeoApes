@@ -1,0 +1,65 @@
+
+###CODE FOR GGPLOT
+library(ggplot2)
+library(readr)
+library(viridis) # Load the viridis package
+
+# Load data
+data <- read_delim("path/to/your/data-codiv-geo-phylo-table.txt", "\t", escape_double = FALSE, trim_ws = TRUE)
+ 
+# Generate plot with colorblind-friendly color scheme
+my_plot <- ggplot(data, aes(x = `classification-first-MAG`, y = `r-geo-minus-r-phylo`, color = phylum)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.2), alpha = 0.5) +
+  facet_wrap(~`classification-first-MAG`, scales = "free_x") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_viridis(discrete = TRUE, option = "D") + # Use viridis color scale
+  theme_minimal(base_family = "Helvetica") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size = 8),
+        strip.text = element_text(size = 8),
+        legend.position = "right",
+        panel.background = element_rect(fill = "white", colour = "white"),
+        plot.background = element_rect(fill = "white", colour = NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  labs(y = "r-geo minus r-phylo", title = "Box Plot of r-geo minus r-phylo Faceted by Classification-First-MAG")
+
+# Optionally, save plot to file
+ggsave("my_plot_colorblind_friendly.png", plot = my_plot, width = 10, height = 8, dpi = 300)
+
+
+
+###CODE FOR HAVERSINE DISTANCES
+corrected_coordinates = [
+    (-4.666, 29.633),  # S and E are negative and positive, respectively
+    (-2.76, 20.378611),                # S and E are negative and positive, respectively
+    (0.0774, 22.8422),                 # S is negative, E is positive
+    (-1.1833, 23.266),  # S and E are negative and positive, respectively
+    (-2.69672, 25.13752),              # S and E are negative and positive, respectively
+    (-2.69207, 25.13820),              # S and E are negative and positive, respectively
+    (-2.73634, 25.11536),              # S and E are negative and positive, respectively
+    (-2.69139, 25.13261),              # S and E are negative and positive, respectively
+    (3.43259, 13.04773),               # N and E are positive
+    (3.45971, 13.09595),               # N and E are positive
+    (3.4699, 13.18180),                # N and E are positive
+    (3.4426, 13.07040),                # N and E are positive
+    (2.271009, 16.602412),             # N and E are positive
+    (-1.017, 29.683),                  # S and E are negative and positive, respectively
+    (-2.166, 9.56666),                 # S and E are negative and positive, respectively
+    (1.72417, 31.54583),               # N and E are positive
+    (5.75, -7.11666),                  # N and W are positive and negative, respectively
+]
+
+distance_matrix = np.zeros((num_sites, num_sites))
+
+for i in range(num_sites):
+    for j in range(num_sites):
+        lon1, lat1 = corrected_coordinates[i]
+        lon2, lat2 = corrected_coordinates[j]
+        distance_matrix[i][j] = haversine(lon1, lat1, lon2, lat2)
+
+# Since the matrix is symmetric, we can copy the upper triangle to the lower triangle
+distance_matrix = np.triu(distance_matrix) + np.triu(distance_matrix, 1).T
+
+distance_matrix
